@@ -13,7 +13,7 @@ export const requestCloudFunc = async ( data: any) => {
         },
         json: true,
         body:data,
-    },function (error, response, body) {
+    },function (error:any, response:any, body:any) {
       console.log(response.statusCode)
       if (!error && response.statusCode == 200 && body.errcode == 0) {
           resolve(JSON.parse(body.resp_data)) // 请求成功的处理逻辑
@@ -24,5 +24,5 @@ export const requestCloudFunc = async ( data: any) => {
     );
   }).catch((err) => {
     throw err;
-  }
+  })
 }
