@@ -1,7 +1,7 @@
 import  request  from "request";
 import wechat from "./wechat";
-export const requestCloudFunc = async ( data: any) => {
 
+export async function requestCloudFunc<T>(data:any):Promise<T> {
   const access_token = await wechat.getAccessToken();
   return new Promise((resolve,reject) => {
     request({
@@ -14,9 +14,14 @@ export const requestCloudFunc = async ( data: any) => {
         json: true,
         body:data,
     },function (error:any, response:any, body:any) {
-      console.log(response.statusCode)
+
       if (!error && response.statusCode == 200 && body.errcode == 0) {
-          resolve(JSON.parse(body.resp_data)) // 请求成功的处理逻辑
+        const jsondata = JSON.parse(body.resp_data);
+        if (jsondata.code == 0){
+          resolve(jsondata) // 请求成功的处理逻辑
+        } else {
+          reject(jsondata) // 请求失败的处理逻辑
+        }
       }
       // console.log(error)
       reject(response)

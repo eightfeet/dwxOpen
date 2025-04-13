@@ -14,7 +14,7 @@ const app = express();
 
 
 app.use('/api-docs', swaggerUi.serve,swaggerUi.setup(swaggerDocument));
-const port = 80;
+const port = 8000;
 
 middleware(app).then(() => {
   router(app);

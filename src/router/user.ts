@@ -1,5 +1,6 @@
 import express from "express";
 import { requestCloudFunc } from "../lib/requestCloudFunc";
+import { ActiveResponse, CreateResponse, TokenResponse, User, UserResponse } from "types/user";
 
 const router = express.Router();
 
@@ -12,54 +13,85 @@ const router = express.Router();
  *       200:
  *         description: Returns a mysterious string.
  */
-router.get("/getQOrgMember", async function (req, res) {
-  const {org_member_id,org_code} =req.query;
+router.get("/getOrgMember", async function (req, res) {
+  const { org_member_id, org_code } = req.query;
   if (!org_member_id || !org_code) {
     res.send("缺少参数");
   }
-  const data = await requestCloudFunc({key:'QOrgMember', org_member_id,org_code});
+  try {
+    const data = await requestCloudFunc<UserResponse>({
+      key: "QOrgMember",
+      org_member_id,
+      org_code,
+    });
 
-  res.send(data);
-});
+    if (data.data && data.data[0].member_id) {
+      const user = await requestCloudFunc<TokenResponse>({
+        key: "encrypt",
+        member_id: data.data[0].member_id,
+      });
 
-
-router.post("/createQOrgMember", async function (req, res) {
-  console.log(req.body);
-  const {org_member_id,org_code} =req.body;
-  if (!org_member_id || !org_code) {
-    res.send("缺少参数");
+      res.send({
+        ...user,
+        data:{...user.data,
+        org_code: org_code,
+        org_member_id: org_member_id,
+        member_id: data.data[0].member_id,
+        }
+      });
+    } else {
+      const user = await requestCloudFunc<CreateResponse>({
+        key: "CUOrgMember",
+        org_member_id,
+        org_code,
+      });
+      const token = await requestCloudFunc<TokenResponse>({
+        key: "encrypt",
+        member_id: user.data.member_id,
+      });
+      res.send({
+        ...token,
+        data:{...token.data,org_code: org_code,
+        org_member_id: org_member_id,
+        member_id: user.data.member_id},
+      });
+    }
+  } catch (error) {
+    res.send(error);
   }
-  const data = await requestCloudFunc({key:'CUOrgMember', org_member_id,org_code});
-
-  res.send(data);
-});
-
-router.post("/loginByMemberId", async function (req, res) {
-  const {member_id} =req.body;
-  if (!member_id ) {
-    res.send("缺少参数");
-  }
-  const data = await requestCloudFunc({key:'encrypt', member_id});
-
-  res.send(data);
 });
 
 router.post("/activationCodeToSN", async function (req, res) {
-  const {code,// 邀请码
+  const {
+    code, // 邀请码
     email,
     username,
     member_id,
-    token// 登录时的token
-    } =req.body;
-  if (!member_id || !code || !email || !username || !token ) {
+    token, // 登录时的token
+  } = req.body;
+  if (!member_id || !code || !email || !username || !token) {
     res.send("缺少参数");
   }
-  const data = await requestCloudFunc({key:'activationCodeToSN', code,// 邀请码
+  try {
+  const data = await requestCloudFunc<ActiveResponse>({
+    key: "activationCodeToSN",
+    code, // 邀请码
     email,
     username,
     member_id,
-    token});
+    token,
+  });
 
-  res.send(data);
+  res.send({
+    code: data.code,
+    status: data.status,
+    data: {
+      member_id: data.data.member_id,
+      created_at: data.data.created_at,
+      end_at: data.data.end_at,
+    },
+  });
+} catch (error) {
+  res.send(error);
 });
 export default router;

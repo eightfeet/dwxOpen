@@ -7,7 +7,6 @@ class Wechat {
   appSecret: string;
   constructor() {
     this.appId = process.env.appId!;
-    console.log(this.appId);
     this.appSecret = process.env.appSecret!;
   }
   getAccessToken: () => Promise<string> = async () => {
