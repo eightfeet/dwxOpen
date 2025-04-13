@@ -93,5 +93,6 @@ router.post("/activationCodeToSN", async function (req, res) {
   });
 } catch (error) {
   res.send(error);
+}
 });
 export default router;

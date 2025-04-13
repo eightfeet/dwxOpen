@@ -3,7 +3,7 @@ import wechat from "./wechat";
 
 export async function requestCloudFunc<T>(data:any):Promise<T> {
   const access_token = await wechat.getAccessToken();
-  return new Promise((resolve,reject) => {
+  return new Promise<T>((resolve,reject) => {
     request({
       url:`https://api.weixin.qq.com/tcb/invokecloudfunction?access_token=${access_token}&env=${process.env.cloudenv}&name=${process.env.functionName}`,
 
