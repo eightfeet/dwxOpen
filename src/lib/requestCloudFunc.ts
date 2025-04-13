@@ -16,8 +16,9 @@ export async function requestCloudFunc<T>(data:any):Promise<T> {
     },function (error:any, response:any, body:any) {
 
       if (!error && response.statusCode == 200 && body.errcode == 0) {
+
         const jsondata = JSON.parse(body.resp_data);
-        if (jsondata.code == 0){
+        if (jsondata.code == 200 || jsondata.msg == "找不到任何用户"){
           resolve(jsondata) // 请求成功的处理逻辑
         } else {
           reject(jsondata) // 请求失败的处理逻辑

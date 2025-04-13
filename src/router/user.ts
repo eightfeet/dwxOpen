@@ -30,7 +30,6 @@ router.get("/getOrgMember", async function (req, res) {
         key: "encrypt",
         member_id: data.data[0].member_id,
       });
-
       res.send({
         ...user,
         data:{...user.data,
