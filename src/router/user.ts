@@ -1,6 +1,13 @@
 import express from "express";
 import { requestCloudFunc } from "../lib/requestCloudFunc";
 import { ActiveResponse, CreateResponse, TokenResponse, User, UserResponse } from "types/user";
+export const asyncHandler = (fn:any) => (...args:any) => {
+  const fnReturn = fn(...args)
+  const next = args[args.length - 1]
+  return Promise
+      .resolve(fnReturn)
+      .catch(next)
+}
 
 const router = express.Router();
 
@@ -13,7 +20,7 @@ const router = express.Router();
  *       200:
  *         description: Returns a mysterious string.
  */
-router.get("/getOrgMember", async function (req, res) {
+router.get("/getOrgMember", asyncHandler(async function (req:any, res:any) {
   const { org_member_id, org_code } = req.query;
   if (!org_member_id || !org_code) {
     res.send("缺少参数");
@@ -61,9 +68,9 @@ router.get("/getOrgMember", async function (req, res) {
   } catch (error) {
     res.send(error);
   }
-});
+}));
 
-router.post("/activationCodeToSN", async function (req, res) {
+router.post("/activationCodeToSN", asyncHandler(async function (req:any, res:anyy) {
   const {
     code, // 邀请码
     email,
@@ -98,5 +105,5 @@ router.post("/activationCodeToSN", async function (req, res) {
 } catch (error) {
   res.send(error);
 }
-});
+}));
 export default router;

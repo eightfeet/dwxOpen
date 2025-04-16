@@ -53,3 +53,9 @@ npm run commit
 - Jest
 - Prettier - Code formatter
 - EditorConfig for VS Code
+
+node 用的18版本
+服务器用的caddy
+启动caddy start
+curl localhost:2019/load 	-H "Content-Type: application/json" 	-d @caddy.json
+启动node

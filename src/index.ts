@@ -19,7 +19,9 @@ const port = 8000;
 middleware(app).then(() => {
   router(app);
 });
-
+app.use((err:any, req:any, res:any, next:any) => {
+  res.status(500).send('Something broke!')
+})
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
